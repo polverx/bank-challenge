@@ -1,9 +1,7 @@
 package co.com.evermore.config;
 
-import co.com.evermore.api.TransactionHistoryController;
 import co.com.evermore.model.user.gateways.TransactionHistoryRepository;
 import co.com.evermore.usecase.TransactionHistoryUseCase;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.*;
 
 @Configuration
