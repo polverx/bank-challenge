@@ -1,6 +1,7 @@
 package co.com.evermore.api;
 
 import co.com.evermore.dto.TransactionDto;
+import co.com.evermore.dto.TransactionResponseDto;
 import co.com.evermore.model.transactionhistory.TransactionHistory;
 import co.com.evermore.usecase.TransactionHistoryUseCase;
 import co.com.evermore.usecase.TransactionUseCase;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -80,16 +82,16 @@ public class TransactionControllerTest {
         when(transactionUseCase.createNewTransaction(any()))
                 .thenReturn(Mono.just(transactionHistory));
 
-        Mono<TransactionHistory> createdTransactionMono = transactionController.createTransaction(transactionDto);
+        Mono<ResponseEntity<TransactionResponseDto>> createdTransactionMono = transactionController.createTransaction(transactionDto);
 
         createdTransactionMono.subscribe(createdTransaction -> {
-            assert createdTransaction.getUserId().equals(BigInteger.valueOf(1));
-            assert createdTransaction.getAmountSent().equals("100");
-            assert createdTransaction.getUserBankAccountId().equals("1234");
-            assert createdTransaction.getTransactionStatus().equals("SUCCESS");
-            assert createdTransaction.getRequest().equals("Transaction request");
-            assert createdTransaction.getResponse().equals("Transaction response");
-            assert createdTransaction.getCreatedAt() != null;
+            assert createdTransaction.getBody().getResult().getUserId().equals(BigInteger.valueOf(1));
+            assert createdTransaction.getBody().getResult().getAmountSent().equals("100");
+            assert createdTransaction.getBody().getResult().getUserBankAccountId().equals("1234");
+            assert createdTransaction.getBody().getResult().getTransactionStatus().equals("SUCCESS");
+            assert createdTransaction.getBody().getResult().getRequest().equals("Transaction request");
+            assert createdTransaction.getBody().getResult().getResponse().equals("Transaction response");
+            assert createdTransaction.getBody().getResult().getCreatedAt() != null;
         });
     }
 }

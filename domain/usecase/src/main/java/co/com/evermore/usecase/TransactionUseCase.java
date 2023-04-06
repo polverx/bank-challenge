@@ -1,11 +1,13 @@
 package co.com.evermore.usecase;
 
+import co.com.evermore.model.common.ex.BusinessException;
 import co.com.evermore.model.provider.ProviderTransaction;
 import co.com.evermore.model.provider.gateways.ProviderTransactionGateway;
 import co.com.evermore.model.transaction.Transaction;
 import co.com.evermore.model.transactionhistory.TransactionHistory;
 import co.com.evermore.model.transactionhistory.gateways.TransactionHistoryRepository;
 import co.com.evermore.model.user.gateways.UserRepository;
+import co.com.evermore.model.wallet.WalletBalance;
 import co.com.evermore.model.wallet.WalletTransaction;
 import co.com.evermore.model.wallet.gateways.WalletGateway;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +29,8 @@ public class TransactionUseCase {
     public Mono<TransactionHistory> createNewTransaction(Transaction transaction) {
 
         return walletGateway.getUserBalance(transaction.getUserId())
-                .flatMap(walletBalance -> Mono.just(walletBalance.getBalance().compareTo(transaction.getAmount()) >= 0))
-                .flatMap(aBoolean -> userRepository.findUserById(transaction.getUserId()))
+                .flatMap(walletBalance -> balanceValidation(transaction, walletBalance))
+                .flatMap(transactionRequest -> userRepository.findUserById(transactionRequest.getUserId()))
                 .flatMap(user -> walletGateway.createWalletTransaction(WalletTransaction.builder()
                                 .userId(user.getUserId())
                                 .amount(transaction.getAmount())
@@ -52,6 +54,15 @@ public class TransactionUseCase {
                         .request(providerTransactionResponse.getRequest())
                         .response(providerTransactionResponse.getResponse())
                         .build()));
+    }
+
+    private Mono<Transaction> balanceValidation(Transaction transaction, WalletBalance walletBalance) {
+
+        String additionalInfo = "Current Wallet Balance: " + walletBalance.getBalance() + " Balance required: " + transaction.getAmount();
+
+        return walletBalance.getBalance().compareTo(transaction.getAmount()) >= 0
+                ? Mono.just(transaction)
+                : Mono.error(new BusinessException(BusinessException.Type.INSUFFICIENT_FUNDS, additionalInfo));
     }
 
 

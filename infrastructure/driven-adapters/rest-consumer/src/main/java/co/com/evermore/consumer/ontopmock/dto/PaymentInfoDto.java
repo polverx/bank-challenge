@@ -2,6 +2,7 @@ package co.com.evermore.consumer.ontopmock.dto;
 
 import co.com.evermore.model.provider.PaymentInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 @Builder(toBuilder = true)
 public class PaymentInfoDto {
     private BigDecimal amount;
+    @JsonProperty("id")
     private String providerTransactionId;
 
     public PaymentInfo buildPaymentInfo() {

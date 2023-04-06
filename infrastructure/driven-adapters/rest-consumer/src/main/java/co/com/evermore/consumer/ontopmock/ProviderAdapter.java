@@ -4,10 +4,10 @@ import co.com.evermore.consumer.ontopmock.dto.*;
 import co.com.evermore.model.provider.ProviderTransaction;
 import co.com.evermore.model.provider.ProviderTransactionResponse;
 import co.com.evermore.model.provider.gateways.ProviderTransactionGateway;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ public class ProviderAdapter implements ProviderTransactionGateway {
     @Value("${ontop.bank-account.routing-number}")
     private String onTopAccountRoutingNumber;
     private final WebClient webClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
     private static final String EMPTY_SPACE = " ";
     private static final String EMPTY_STRING = "";
 
