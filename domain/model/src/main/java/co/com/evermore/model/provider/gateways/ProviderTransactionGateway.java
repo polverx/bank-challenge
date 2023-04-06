@@ -5,5 +5,5 @@ import co.com.evermore.model.provider.ProviderTransactionResponse;
 import reactor.core.publisher.Mono;
 
 public interface ProviderTransactionGateway {
-    Mono<ProviderTransactionResponse> createProviderTransaction(ProviderTransaction providerTransaction);
+    Mono<ProviderTransactionResponse> createBankTransaction(ProviderTransaction providerTransaction);
 }

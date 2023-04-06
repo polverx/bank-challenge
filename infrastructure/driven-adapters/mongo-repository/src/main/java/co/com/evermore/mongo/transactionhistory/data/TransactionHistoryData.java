@@ -18,7 +18,7 @@ import java.util.Date;
 public class TransactionHistoryData {
     @Id
     private String id;
-    private BigInteger userId;
+    private Integer userId;
     private String bankAccountId;
     private String amountSent;
     private String userBankAccountId;

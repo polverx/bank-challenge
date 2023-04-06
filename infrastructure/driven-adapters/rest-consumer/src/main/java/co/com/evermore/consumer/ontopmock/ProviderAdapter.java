@@ -40,7 +40,7 @@ public class ProviderAdapter implements ProviderTransactionGateway {
     private static final String EMPTY_STRING = "";
 
     @Override
-    public Mono<ProviderTransactionResponse> createProviderTransaction(ProviderTransaction providerTransaction) {
+    public Mono<ProviderTransactionResponse> createBankTransaction(ProviderTransaction providerTransaction) {
 
         String uri = UriComponentsBuilder
                 .fromPath(providerTransactionUri)

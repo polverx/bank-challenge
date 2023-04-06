@@ -37,11 +37,11 @@ public class TransactionUseCase {
         log.info("Starting a new transaction with the info: " + transaction);
 
         return transactionFieldsValidation(transaction)
-                .flatMap(validatedTransaction -> walletGateway.getUserBalance(validatedTransaction.getUserId()))
-                .flatMap(walletBalance -> balanceValidation(transaction, walletBalance))
                 .flatMap(validatedTransaction -> userRepository.findUserById(validatedTransaction.getUserId()))
-                .flatMap(user -> getProviderTransaction(transaction, user))
-                .flatMap(providerGateway::createProviderTransaction)
+                .flatMap(user -> buildProviderTransaction(transaction, user))
+                .flatMap(providerTransaction -> walletGateway.getUserBalance(providerTransaction.getUserId())
+                        .flatMap(walletBalance -> balanceValidation(providerTransaction, walletBalance)))
+                .flatMap(providerGateway::createBankTransaction)
                 .flatMap(providerTransactionResponse -> walletGateway.createWalletTransaction(transaction.getAmount(), transaction.getUserId())
                         .flatMap(walletTransaction -> transactionHistoryRepository.saveTransaction(buildTransactionHistory(transaction, providerTransactionResponse))));
     }
@@ -55,16 +55,16 @@ public class TransactionUseCase {
                 : Mono.just(transaction);
     }
 
-    private Mono<Transaction> balanceValidation(Transaction transaction, WalletBalance walletBalance) {
+    private Mono<ProviderTransaction> balanceValidation(ProviderTransaction providerTransaction, WalletBalance walletBalance) {
 
-        String additionalInfo = "Current Wallet Balance: " + walletBalance.getBalance() + " Balance required: " + transaction.getAmount();
+        String additionalInfo = "Current Wallet Balance: " + walletBalance.getBalance() + " Balance required: " + providerTransaction.getAmount();
 
-        return walletBalance.getBalance().compareTo(transaction.getAmount()) >= 0
-                ? Mono.just(transaction)
+        return walletBalance.getBalance().compareTo(providerTransaction.getAmount()) >= 0
+                ? Mono.just(providerTransaction)
                 : Mono.error(new BusinessException(BusinessException.Type.INSUFFICIENT_FUNDS, additionalInfo));
     }
 
-    private Mono<ProviderTransaction> getProviderTransaction(Transaction transaction, User user) {
+    private Mono<ProviderTransaction> buildProviderTransaction(Transaction transaction, User user) {
 
         BigDecimal amountWithFeeApplied = transaction.getAmount().subtract(transaction.getAmount().multiply(onTopFee));
 
@@ -76,6 +76,7 @@ public class TransactionUseCase {
 
         return findUserBankAccount(transaction, user)
                 .map(userBankAccount -> ProviderTransaction.builder()
+                        .userId(user.getUserId())
                         .firstName(user.getFirstName())
                         .lastName(user.getLastName())
                         .userBankAccount(userBankAccount)
