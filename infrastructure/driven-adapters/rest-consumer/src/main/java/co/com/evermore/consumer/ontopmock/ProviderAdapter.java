@@ -1,6 +1,8 @@
 package co.com.evermore.consumer.ontopmock;
 
+import co.com.evermore.consumer.ex.ServiceException;
 import co.com.evermore.consumer.ontopmock.dto.*;
+import co.com.evermore.model.common.ex.BusinessException;
 import co.com.evermore.model.provider.ProviderTransaction;
 import co.com.evermore.model.provider.ProviderTransactionResponse;
 import co.com.evermore.model.provider.gateways.ProviderTransactionGateway;
@@ -56,11 +58,13 @@ public class ProviderAdapter implements ProviderTransactionGateway {
                 .uri(uri)
                 .bodyValue(requestBody)
                 .exchangeToMono(clientResponse -> clientResponse.statusCode().isError()
-                        ? Mono.error(new Exception("Error")) //TODO add better error handling
+                        ? clientResponse
+                        .bodyToMono(String.class)
+                        .flatMap(responseBody -> Mono.error(new ServiceException(clientResponse.statusCode(), responseBody)))
                         : clientResponse.bodyToMono(ProviderTransactionResponseDto.class))
                 .flatMap(ProviderTransactionResponseDto::toMonoProviderTransaction)
                 .map(providerTransactionResponse -> addJsonStringsToEntity(requestBody, providerTransactionResponse))
-                .onErrorResume(Exception.class, error -> Mono.error(new Exception("Error happened while executing the provider transaction", error)));
+                .onErrorResume(e -> Mono.error(new BusinessException(BusinessException.Type.SERVICE_EXCEPTION, e.getMessage())));
     }
 
     private ProviderTransactionResponse addJsonStringsToEntity(ProviderTransactionRequestDto request, ProviderTransactionResponse providerTransactionResponse) {

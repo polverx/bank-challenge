@@ -1,5 +1,6 @@
 package co.com.evermore.mongo.user;
 
+import co.com.evermore.model.common.ex.BusinessException;
 import co.com.evermore.model.user.User;
 import co.com.evermore.model.user.gateways.UserRepository;
 import co.com.evermore.mongo.helper.AdapterOperations;
@@ -40,9 +41,11 @@ public class UserDataRepositoryAdapter
     @Override
     public Mono<User> findUserById(BigInteger userId) {
 
+        String additionalInfo = "User id: " + userId;
+
         return mongoTemplate.findOne(buildUserQuery(userId), UserData.class)
-                .map(UserData::buildUserEntity)//TODO add error when user is not found
-                .switchIfEmpty(Mono.empty());
+                .map(UserData::buildUserEntity)
+                .switchIfEmpty(Mono.error(new BusinessException(BusinessException.Type.USER_NOT_FOUND, additionalInfo)));
     }
 
 

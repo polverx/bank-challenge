@@ -10,5 +10,5 @@ import java.math.BigInteger;
 public interface WalletGateway {
     Mono<WalletBalance> getUserBalance(BigInteger userId);
 
-    Mono<WalletTransaction> createWalletTransaction(BigDecimal amount, BigInteger userId);
+    Mono<WalletTransaction> createWalletTransaction(BigDecimal amount, BigInteger userId, Boolean withdraw);
 }

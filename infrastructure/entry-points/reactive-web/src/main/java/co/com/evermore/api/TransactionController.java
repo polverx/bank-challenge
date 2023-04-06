@@ -46,7 +46,9 @@ public class TransactionController {
 
     private static Mono<ResponseEntity<TransactionResponseDto>> handleGeneralException(Throwable e) {
         log.error("An error occurred while processing the transaction: " + e.getMessage());
-        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build());
     }
 
     private static Mono<ResponseEntity<TransactionResponseDto>> handleBusinessException(BusinessException e) {

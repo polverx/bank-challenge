@@ -42,7 +42,7 @@ public class TransactionUseCase {
                 .flatMap(providerTransaction -> walletGateway.getUserBalance(providerTransaction.getUserId())
                         .flatMap(walletBalance -> balanceValidation(providerTransaction, walletBalance)))
                 .flatMap(providerGateway::createBankTransaction)
-                .flatMap(providerTransactionResponse -> walletGateway.createWalletTransaction(transaction.getAmount(), transaction.getUserId())
+                .flatMap(providerTransactionResponse -> walletGateway.createWalletTransaction(transaction.getAmount(), transaction.getUserId(), true)
                         .flatMap(walletTransaction -> transactionHistoryRepository.saveTransaction(buildTransactionHistory(transaction, providerTransactionResponse))));
     }
 

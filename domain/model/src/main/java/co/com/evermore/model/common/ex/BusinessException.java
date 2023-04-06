@@ -7,7 +7,9 @@ public class BusinessException extends ApplicationException {
     public enum Type {
         INSUFFICIENT_FUNDS("Insufficient funds."),
         MANDATORY_FIELDS_MISSING("Mandatory fields where not found."),
-        NO_MATCHING_BANK_FOUND("User has no bank matching the bank id");
+        NO_MATCHING_BANK_FOUND("User has no bank matching the bank id"),
+        USER_NOT_FOUND("The user was not found on the database."),
+        SERVICE_EXCEPTION("A service exception occurred.");
 
         private final String message;
 

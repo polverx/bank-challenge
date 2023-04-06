@@ -1,7 +1,9 @@
 package co.com.evermore.consumer.ontopmock;
 
+import co.com.evermore.consumer.ex.ServiceException;
 import co.com.evermore.consumer.ontopmock.dto.BalanceResponseDto;
 import co.com.evermore.consumer.ontopmock.dto.WalletTransactionDto;
+import co.com.evermore.model.common.ex.BusinessException;
 import co.com.evermore.model.wallet.WalletBalance;
 import co.com.evermore.model.wallet.WalletTransaction;
 import co.com.evermore.model.wallet.gateways.WalletGateway;
@@ -40,22 +42,24 @@ public class WalletAdapter implements WalletGateway {
                 .get()
                 .uri(uri)
                 .exchangeToMono(clientResponse -> clientResponse.statusCode().isError()
-                        ? Mono.error(new Exception("Error")) //TODO add better error handling
+                        ? clientResponse
+                        .bodyToMono(String.class)
+                        .flatMap(responseBody -> Mono.error(new ServiceException(clientResponse.statusCode(), responseBody)))
                         : clientResponse.bodyToMono(BalanceResponseDto.class)
                 )
-                .flatMap(balanceResponseDto -> Mono.fromCallable(balanceResponseDto::getWalletBalance))
-                .onErrorResume(Exception.class, error -> Mono.error(new Exception("Error happened while fetching balance", error)));
+                .map(BalanceResponseDto::getWalletBalance)
+                .onErrorResume(e -> Mono.error(new BusinessException(BusinessException.Type.SERVICE_EXCEPTION, e.getMessage())));
     }
 
     @Override
-    public Mono<WalletTransaction> createWalletTransaction(BigDecimal amount, BigInteger userId) {
+    public Mono<WalletTransaction> createWalletTransaction(BigDecimal amount, BigInteger userId, Boolean withdraw) {
 
         String uri = UriComponentsBuilder
                 .fromPath(walletTransactionUri)
                 .build()
                 .toUriString();
 
-        WalletTransactionDto requestBody = getWalletTransactionBody(amount, userId);
+        WalletTransactionDto requestBody = getWalletTransactionBody(amount, userId, withdraw);
 
         log.info("Executing a wallet transaction with body: {}", requestBody);
 
@@ -64,16 +68,18 @@ public class WalletAdapter implements WalletGateway {
                 .uri(uri)
                 .bodyValue(requestBody)
                 .exchangeToMono(clientResponse -> clientResponse.statusCode().isError()
-                        ? Mono.error(new Exception("Error")) //TODO add better error handling
+                        ? clientResponse
+                        .bodyToMono(String.class)
+                        .flatMap(responseBody -> Mono.error(new ServiceException(clientResponse.statusCode(), responseBody)))
                         : clientResponse.bodyToMono(WalletTransactionDto.class)
                 )
-                .flatMap(WalletTransactionDto::toMonoWalletTransaction)
-                .onErrorResume(Exception.class, error -> Mono.error(new Exception("Error happened while creating a wallet transaction", error)));
+                .map(WalletTransactionDto::toMonoWalletTransaction)
+                .onErrorResume(e -> Mono.error(new BusinessException(BusinessException.Type.SERVICE_EXCEPTION, e.getMessage())));
     }
 
-    private WalletTransactionDto getWalletTransactionBody(BigDecimal amount, BigInteger userId) {
+    private WalletTransactionDto getWalletTransactionBody(BigDecimal amount, BigInteger userId, boolean withdraw) {
         return WalletTransactionDto.builder()
-                .amount(amount)
+                .amount(withdraw ? amount.negate() : amount)
                 .userId(userId)
                 .build();
     }

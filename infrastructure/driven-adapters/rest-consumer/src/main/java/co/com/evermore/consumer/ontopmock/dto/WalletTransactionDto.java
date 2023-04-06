@@ -26,12 +26,11 @@ public class WalletTransactionDto {
     private BigDecimal amount;
     private BigInteger walletTransactionId;
 
-    public Mono<WalletTransaction> toMonoWalletTransaction() {
-        return Mono.just(
-                WalletTransaction.builder()
-                        .userId(userId)
-                        .amount(amount)
-                        .walletTransactionId(walletTransactionId)
-                        .build());
+    public WalletTransaction toMonoWalletTransaction() {
+        return WalletTransaction.builder()
+                .userId(userId)
+                .amount(amount)
+                .walletTransactionId(walletTransactionId)
+                .build();
     }
 }
