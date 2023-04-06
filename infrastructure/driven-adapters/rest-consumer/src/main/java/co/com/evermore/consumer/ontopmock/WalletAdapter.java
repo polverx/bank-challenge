@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Slf4j
@@ -47,14 +48,14 @@ public class WalletAdapter implements WalletGateway {
     }
 
     @Override
-    public Mono<WalletTransaction> createWalletTransaction(WalletTransaction walletTransaction) {
+    public Mono<WalletTransaction> createWalletTransaction(BigDecimal amount, BigInteger userId) {
 
         String uri = UriComponentsBuilder
                 .fromPath(walletTransactionUri)
                 .build()
                 .toUriString();
 
-        WalletTransactionDto requestBody = getWalletTransactionBody(walletTransaction);
+        WalletTransactionDto requestBody = getWalletTransactionBody(amount, userId);
 
         log.info("Executing a wallet transaction with body: {}", requestBody);
 
@@ -70,10 +71,10 @@ public class WalletAdapter implements WalletGateway {
                 .onErrorResume(Exception.class, error -> Mono.error(new Exception("Error happened while creating a wallet transaction", error)));
     }
 
-    private WalletTransactionDto getWalletTransactionBody(WalletTransaction walletTransaction) {
+    private WalletTransactionDto getWalletTransactionBody(BigDecimal amount, BigInteger userId) {
         return WalletTransactionDto.builder()
-                .amount(walletTransaction.getAmount())
-                .userId(walletTransaction.getUserId())
+                .amount(amount)
+                .userId(userId)
                 .build();
     }
 }

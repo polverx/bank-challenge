@@ -6,10 +6,10 @@ import co.com.evermore.model.user.gateways.UserRepository;
 import co.com.evermore.model.wallet.gateways.WalletGateway;
 import co.com.evermore.usecase.TransactionHistoryUseCase;
 import co.com.evermore.usecase.TransactionUseCase;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+
+import java.math.BigDecimal;
 
 @Configuration
 @ComponentScan(basePackages = "co.com.evermore.usecase",
@@ -18,6 +18,14 @@ import org.springframework.context.annotation.FilterType;
         },
         useDefaultFilters = false)
 public class UseCasesConfig {
+
+    @Value("${ontop.fee}")
+    private String onTopFee;
+
+    @Bean
+    public BigDecimal defaultBigDecimal() {
+        return new BigDecimal(onTopFee);
+    }
 
     @Bean
     public TransactionHistoryUseCase getAllTransactions(
@@ -39,7 +47,8 @@ public class UseCasesConfig {
                 walletGateway,
                 providerTransactionGateway,
                 userRepository,
-                transactionHistoryRepository
+                transactionHistoryRepository,
+                new BigDecimal(onTopFee)
         );
     }
 

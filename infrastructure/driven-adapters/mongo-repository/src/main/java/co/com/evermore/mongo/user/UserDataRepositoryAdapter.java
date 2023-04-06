@@ -40,17 +40,17 @@ public class UserDataRepositoryAdapter
     @Override
     public Mono<User> findUserById(BigInteger userId) {
 
-        return mongoTemplate.findOne(buildUserQuery(1), UserData.class)
-                .map(UserData::buildUserEntity) //TODO add error handlig
+        return mongoTemplate.findOne(buildUserQuery(userId), UserData.class)
+                .map(UserData::buildUserEntity)//TODO add error when user is not found
                 .switchIfEmpty(Mono.empty());
     }
 
 
-    private Query buildUserQuery(Integer userId) {
+    private Query buildUserQuery(BigInteger userId) {
 
         final Query query = new Query();
 
-        return query.addCriteria(Criteria.where(USER_ID).is(userId));
+        return query.addCriteria(Criteria.where(USER_ID).is(userId.intValue()));
     }
 
 }

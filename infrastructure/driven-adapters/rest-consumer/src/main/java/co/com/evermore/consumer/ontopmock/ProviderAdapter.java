@@ -60,7 +60,7 @@ public class ProviderAdapter implements ProviderTransactionGateway {
                         : clientResponse.bodyToMono(ProviderTransactionResponseDto.class))
                 .flatMap(ProviderTransactionResponseDto::toMonoProviderTransaction)
                 .map(providerTransactionResponse -> addJsonStringsToEntity(requestBody, providerTransactionResponse))
-                .onErrorResume(Exception.class, error -> Mono.error(new Exception("Error happened while creating a wallet transaction", error)));
+                .onErrorResume(Exception.class, error -> Mono.error(new Exception("Error happened while executing the provider transaction", error)));
     }
 
     private ProviderTransactionResponse addJsonStringsToEntity(ProviderTransactionRequestDto request, ProviderTransactionResponse providerTransactionResponse) {
