@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
 import java.util.Date;
 
 @Data
@@ -17,8 +18,12 @@ import java.util.Date;
 public class TransactionHistoryData {
     @Id
     private String id;
-    private String userId;
+    private BigInteger userId;
     private String bankAccountId;
     private String amountSent;
+    private String userBankAccountId;
+    private String transactionStatus;
+    private String request;
+    private String response;
     private Date createdAt;
 }

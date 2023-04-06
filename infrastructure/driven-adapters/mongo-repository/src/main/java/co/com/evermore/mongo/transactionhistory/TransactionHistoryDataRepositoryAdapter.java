@@ -1,7 +1,7 @@
 package co.com.evermore.mongo.transactionhistory;
 
-import co.com.evermore.model.user.TransactionHistory;
-import co.com.evermore.model.user.gateways.TransactionHistoryRepository;
+import co.com.evermore.model.transactionhistory.TransactionHistory;
+import co.com.evermore.model.transactionhistory.gateways.TransactionHistoryRepository;
 import co.com.evermore.mongo.helper.AdapterOperations;
 import co.com.evermore.mongo.transactionhistory.data.TransactionHistoryData;
 import lombok.extern.java.Log;
@@ -36,6 +36,12 @@ public class TransactionHistoryDataRepositoryAdapter
     @Override
     public Flux<TransactionHistory> getAllTransactions() {
         return mongoTemplate.findAll(TransactionHistoryData.class)
+                .flatMap(this::mapToDomain);
+    }
+
+    @Override
+    public Mono<TransactionHistory> saveTransaction(TransactionHistory transactionHistory) {
+        return mongoTemplate.save(toData(transactionHistory))
                 .flatMap(this::mapToDomain);
     }
 

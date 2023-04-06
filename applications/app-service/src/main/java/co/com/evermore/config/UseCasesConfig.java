@@ -1,8 +1,15 @@
 package co.com.evermore.config;
 
-import co.com.evermore.model.user.gateways.TransactionHistoryRepository;
+import co.com.evermore.model.provider.gateways.ProviderTransactionGateway;
+import co.com.evermore.model.transactionhistory.gateways.TransactionHistoryRepository;
+import co.com.evermore.model.user.gateways.UserRepository;
+import co.com.evermore.model.wallet.gateways.WalletGateway;
 import co.com.evermore.usecase.TransactionHistoryUseCase;
-import org.springframework.context.annotation.*;
+import co.com.evermore.usecase.TransactionUseCase;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 
 @Configuration
 @ComponentScan(basePackages = "co.com.evermore.usecase",
@@ -12,11 +19,29 @@ import org.springframework.context.annotation.*;
         useDefaultFilters = false)
 public class UseCasesConfig {
 
-        @Bean
-        @Primary
-        public TransactionHistoryUseCase getAllTransactions(TransactionHistoryRepository transactionHistoryRepository){
-                return new TransactionHistoryUseCase(transactionHistoryRepository);
-        }
+    @Bean
+    public TransactionHistoryUseCase getAllTransactions(
+            TransactionHistoryRepository transactionHistoryRepository
+    ) {
+        return new TransactionHistoryUseCase(
+                transactionHistoryRepository
+        );
+    }
+
+    @Bean
+    public TransactionUseCase createNewTransaction(
+            WalletGateway walletGateway,
+            ProviderTransactionGateway providerTransactionGateway,
+            UserRepository userRepository,
+            TransactionHistoryRepository transactionHistoryRepository
+    ) {
+        return new TransactionUseCase(
+                walletGateway,
+                providerTransactionGateway,
+                userRepository,
+                transactionHistoryRepository
+        );
+    }
 
 
 }
