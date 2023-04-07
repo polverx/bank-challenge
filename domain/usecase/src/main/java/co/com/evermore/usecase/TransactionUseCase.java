@@ -40,7 +40,7 @@ public class TransactionUseCase {
                 .flatMap(validatedTransaction -> userRepository.findUserById(validatedTransaction.getUserId()))
                 .flatMap(user -> buildProviderTransaction(transaction, user))
                 .flatMap(providerTransaction -> walletGateway.getUserBalance(providerTransaction.getUserId())
-                        .flatMap(walletBalance -> balanceValidation(providerTransaction, walletBalance)))
+                        .flatMap(walletBalance -> balanceValidation(providerTransaction, walletBalance, transaction.getAmount())))
                 .flatMap(providerGateway::createBankTransaction)
                 .flatMap(providerTransactionResponse -> walletGateway.createWalletTransaction(transaction.getAmount(), transaction.getUserId(), true)
                         .flatMap(walletTransaction -> transactionHistoryRepository.saveTransaction(buildTransactionHistory(transaction, providerTransactionResponse))));
@@ -55,11 +55,11 @@ public class TransactionUseCase {
                 : Mono.just(transaction);
     }
 
-    private Mono<ProviderTransaction> balanceValidation(ProviderTransaction providerTransaction, WalletBalance walletBalance) {
+    private Mono<ProviderTransaction> balanceValidation(ProviderTransaction providerTransaction, WalletBalance walletBalance, BigDecimal amount) {
 
-        String additionalInfo = "Current Wallet Balance: " + walletBalance.getBalance() + " Balance required: " + providerTransaction.getAmount();
+        String additionalInfo = "Current Wallet Balance: " + walletBalance.getBalance() + " Balance required: " + amount;
 
-        return walletBalance.getBalance().compareTo(providerTransaction.getAmount()) >= 0
+        return walletBalance.getBalance().compareTo(amount) >= 0
                 ? Mono.just(providerTransaction)
                 : Mono.error(new BusinessException(BusinessException.Type.INSUFFICIENT_FUNDS, additionalInfo));
     }

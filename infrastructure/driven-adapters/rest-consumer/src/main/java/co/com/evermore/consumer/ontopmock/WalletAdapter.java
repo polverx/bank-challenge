@@ -41,7 +41,10 @@ public class WalletAdapter implements WalletGateway {
         return webClient
                 .get()
                 .uri(uri)
-                .exchangeToMono(clientResponse -> clientResponse.statusCode().isError()
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .exchange()
+                .flatMap(clientResponse -> clientResponse.statusCode().isError()
                         ? clientResponse
                         .bodyToMono(String.class)
                         .flatMap(responseBody -> Mono.error(new ServiceException(clientResponse.statusCode(), responseBody)))
