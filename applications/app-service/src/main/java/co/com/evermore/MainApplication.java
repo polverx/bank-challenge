@@ -13,6 +13,7 @@ public class MainApplication {
 
     public static void main(String[] args) {
         System.setProperty("javax.net.ssl.trustStore", "none");
+        System.setProperty("jdk.tls.disabledAlgorithms", "");
         SpringApplication.run(MainApplication.class, args);
     }
 }
