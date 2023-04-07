@@ -7,7 +7,10 @@ import co.com.evermore.model.wallet.gateways.WalletGateway;
 import co.com.evermore.usecase.TransactionHistoryUseCase;
 import co.com.evermore.usecase.TransactionUseCase;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 
 import java.math.BigDecimal;
 

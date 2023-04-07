@@ -40,13 +40,13 @@ $ ./gradlew build
 Once the jar has been created navigate to the directory where you built the JAR file:
 
 ```
-$ cd bank-challenge/build/libs
+$ cd bank-challenge/applications/app-service/build/libs
 ```
 
 Then run the JAR file using the following command:
 
 ```
-$ java -jar bank-challenge-1.0.0.jar
+$ java -jar EverBank.jar
 ```
 
 This will start the application and make it available at http://localhost:8080.

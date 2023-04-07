@@ -1,8 +1,6 @@
 package co.com.evermore.consumer.ontopmock.dto;
 
-import co.com.evermore.model.provider.PaymentInfo;
 import co.com.evermore.model.provider.ProviderTransactionResponse;
-import co.com.evermore.model.provider.RequestInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
